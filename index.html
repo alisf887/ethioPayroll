@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ethiopian Payroll System</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f4f1;--surface:#fff;--ink:#17201b;--muted:#5d6a62;--line:#d9ddd6;--accent:#1d6b45;--accent-ink:#fff;--warn:#a3341f;--soft:#e8efe9;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#111613;--surface:#1a211d;--ink:#e8ede9;--muted:#9aa89f;--line:#2e3832;--accent:#4cbf83;--accent-ink:#0c1a12;--warn:#ef8a74;--soft:#202b25}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#111613;--surface:#1a211d;--ink:#e8ede9;--muted:#9aa89f;--line:#2e3832;--accent:#4cbf83;--accent-ink:#0c1a12;--warn:#ef8a74;--soft:#202b25}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 18px 60px}
+header{display:flex;gap:14px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;border-bottom:3px solid var(--accent);padding-bottom:14px;margin-bottom:22px}
+h1{font:600 28px/1.15 "IBM Plex Serif",Georgia,serif;margin:0}
+header p{margin:4px 0 0;color:var(--muted);max-width:60ch}
+.grid{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:20px;align-items:start}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:18px}
+h2{font:600 17px/1.2 "IBM Plex Serif",Georgia,serif;margin:0 0 12px}
+fieldset{border:0;padding:0;margin:0 0 14px}
+legend{font-weight:600;font-size:13px;color:var(--muted);padding:0 0 6px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
+input{width:100%;margin-top:3px;padding:8px 9px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px}
+input:focus-visible,button:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+input.bad{border-color:var(--warn)}
+.err{color:var(--warn);font-size:13px;min-height:20px;margin:4px 0}
+button{font:inherit;font-weight:500;padding:9px 14px;border-radius:4px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer}
+button.ghost{background:transparent;color:var(--accent)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse}
+td,th{padding:6px 0;text-align:left}
+td:last-child,th:last-child{text-align:right}
+.sec td{border-top:1px solid var(--line)}
+.sec:first-child td{border-top:0}
+.sub td{color:var(--muted);font-size:13px;padding-left:14px}
+.tot td{font-weight:600;border-top:1px solid var(--ink)}
+.net{display:flex;justify-content:space-between;align-items:baseline;background:var(--soft);border-left:4px solid var(--accent);padding:12px 14px;margin-top:12px;border-radius:0 4px 4px 0}
+.net b{font:600 26px "IBM Plex Serif",Georgia,serif}
+.meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin-bottom:10px}
+.scroll{overflow-x:auto}
+.batch th{font-size:13px;color:var(--muted);border-bottom:1px solid var(--ink)}
+.batch td,.batch th{padding:7px 10px;white-space:nowrap;text-align:right}
+.batch td:first-child,.batch th:first-child{text-align:left}
+.batch td:last-child,.batch th:last-child{text-align:right}
+.x{padding:2px 8px;font-size:13px;border-color:var(--line);background:transparent;color:var(--warn)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:14px 0}
+.stat{border:1px solid var(--line);border-radius:4px;padding:10px 12px}
+.stat span{display:block;color:var(--muted);font-size:12.5px}
+.stat b{font-size:18px}
+.gov{background:var(--soft);border-radius:4px;padding:10px 14px;display:flex;gap:24px;flex-wrap:wrap}
+textarea{width:100%;min-height:120px;font:12px/1.4 ui-monospace,Menlo,monospace;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:8px}
+.empty{color:var(--muted);padding:6px 0}
+.note{font-size:12.5px;color:var(--muted);margin-top:18px}
+#theme{background:transparent;color:var(--muted);border-color:var(--line)}
+nav{display:flex;gap:2px;overflow-x:auto;margin:-8px 0 20px;border-bottom:1px solid var(--line)}
+nav a{padding:9px 14px;color:var(--muted);text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap}
+nav a[aria-current=page]{color:var(--ink);border-color:var(--accent);font-weight:600}
+[hidden]{display:none!important}
+.card table.plain td,.card table.plain th{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left}
+.card table.plain td:last-child,.card table.plain th:last-child{text-align:left}
+.pass{color:var(--accent)}.fail{color:var(--warn);font-weight:600}
+.kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:12px 0}
+.kp div{border:1px solid var(--line);border-radius:4px;padding:9px 12px}.kp span{display:block;font-size:12.5px;color:var(--muted)}.kp b{font-size:18px}
+.danger{background:transparent;color:var(--warn);border-color:var(--line)}
+button{border-radius:.375rem;padding:.42rem .9rem;transition:filter .15s,box-shadow .15s}
+button:hover:not(:disabled){filter:brightness(1.08)}
+button:focus-visible{outline:0;box-shadow:0 0 0 .2rem color-mix(in srgb,var(--accent) 30%,transparent)}
+.card{border-radius:.5rem;box-shadow:0 1px 2px rgba(0,0,0,.07)}
+nav a{border:1px solid transparent;border-radius:.375rem .375rem 0 0;margin-bottom:-1px}
+nav a[aria-current=page]{background:var(--surface);border-color:var(--line) var(--line) var(--surface);color:var(--ink)}
+.batch tbody tr:nth-child(odd){background:color-mix(in srgb,var(--soft) 55%,transparent)}
+.batch tbody tr:hover{background:var(--soft)}
+.btn-sm{padding:.2rem .6rem;font-size:13px}
+.site-footer{margin-top:40px;padding:20px 0 8px;border-top:1px solid var(--line);text-align:center;font-size:14px;color:var(--muted)}
+.site-footer strong{color:var(--ink);font-weight:600}
+header{border-bottom:0;background:linear-gradient(90deg,#078930 0 33.3%,#fcdd09 33.3% 66.6%,#da121a 66.6%) bottom/100% 4px no-repeat}
+.brandrow{display:flex;align-items:center;gap:12px}
+.skip{position:absolute;left:-999px}.skip:focus{left:8px;top:8px;background:var(--surface);padding:6px 10px;z-index:60;border-radius:4px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.kp.big div{padding:14px 16px;border-left:4px solid var(--accent)}.kp.big b{font-size:22px}
+.bars{display:grid;grid-template-columns:110px 1fr 120px;gap:8px 12px;align-items:center}
+.bar{height:10px;background:var(--accent);border-radius:5px;min-width:3px}
+.badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600;background:var(--soft);color:var(--accent);border:1px solid var(--line)}
+.tall{max-height:460px;overflow:auto}.sticky thead th{position:sticky;top:0;background:var(--surface);z-index:1}
+button.th{background:none;border:0;color:inherit;padding:0;font:inherit;font-weight:600;cursor:pointer}
+button.th:hover{filter:none;text-decoration:underline}
+.srch{display:block;max-width:320px;margin-bottom:10px}
+#toasts{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px;z-index:50}
+.toast{background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.25);max-width:320px;font-size:13.5px;border-left:4px solid var(--warn)}.toast.ok{border-left-color:var(--accent)}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+[id^=v-]:not([hidden]){animation:fi .2s ease}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media(max-width:560px){.bars{grid-template-columns:80px 1fr 90px}}
+button.sw{padding:0;width:28px;height:28px;border-radius:50%;border:2px solid var(--line)}
+button.sw[aria-pressed=true]{border-color:var(--ink);box-shadow:0 0 0 2px var(--surface)}
+body,.card,header{transition:background-color .25s,border-color .25s}
+header{background-color:var(--bg);color:var(--ink);padding:18px 20px 24px;border-radius:8px}
+header h1{color:var(--ink)}header p{color:var(--muted);opacity:1}
+header #theme{background:transparent;color:var(--ink);border:2px solid var(--line);font-weight:600}
+button.sw{width:30px;height:30px;border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line)}
+button.sw[aria-pressed=true]{border-color:var(--ink);box-shadow:none}
+thead th{background:var(--accent)!important;color:var(--accent-ink)!important;font-weight:600}
+thead th button.th{color:var(--accent-ink)}
+.net{background:var(--accent);color:var(--accent-ink);border-left:0;border-radius:6px}
+.kp.big div{border-left-width:6px;background:var(--soft)}
+.badge{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+nav a[aria-current=page]{border-top:3px solid var(--accent);font-weight:700}
+h2{color:var(--accent)}
+.bar{height:14px}
+.card{box-shadow:0 2px 14px rgba(70,70,140,.14);border-color:transparent}
+</style>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>try{tailwind.config={corePlugins:{preflight:false}}}catch(e){}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+<a class="skip" href="#" onclick="document.getElementById('content').focus();return false">Skip to content</a>
+<div class="wrap" id="content" tabindex="-1">
+<header>
+  <div>
+    <div class="brandrow"><svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true"><rect width="38" height="38" rx="8" style="fill:var(--accent)"/><circle cx="19" cy="19" r="9" fill="none" stroke="#fcdd09" stroke-width="2.5"/><path d="M19 12v14M15 16h6a3 3 0 010 6h-6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg><h1>Ethiopian Payroll System</h1></div>
+    <p>Payslips under Proclamation No. 979/2016 as amended by No. 1395/2025: overtime, pension, transport exemption and progressive income tax.</p>
+  </div>
+  <div class="flex items-center gap-3"><div id="swatches" class="flex items-center gap-2" role="group" aria-label="Colour palette"></div><button id="theme" type="button" aria-label="Switch light or dark theme">Theme</button></div>
+</header>
+<nav id="nav" aria-label="Sections"></nav>
+
+<div id="v-slip">
+<div class="grid">
+<section class="card" aria-labelledby="h-in">
+  <h2 id="h-in">Employee details</h2>
+  <div class="row">
+    <label>Employee name<input id="name" autocomplete="off"></label>
+    <label>Payroll month<input id="month" placeholder="e.g. Hamle 2018"></label>
+  </div>
+  <fieldset><legend>Monthly pay (birr)</legend>
+    <div class="row">
+      <label>Basic salary<input id="basic" type="number" min="0" step="0.01" inputmode="decimal" value="12000"></label>
+      <label>Transport allowance<input id="transport" type="number" min="0" step="0.01" inputmode="decimal" value="2500"></label>
+      <label>Other allowance<input id="other" type="number" min="0" step="0.01" inputmode="decimal" value="0"></label>
+      <label>Other deduction<input id="otherded" type="number" min="0" step="0.01" inputmode="decimal" value="0"></label>
+    </div>
+  </fieldset>
+  <fieldset><legend>Overtime</legend>
+    <label>Hourly salary<input id="hourly" type="number" min="0" step="0.01" inputmode="decimal" value="68.18"></label>
+    <div class="row">
+      <label>Day hours (×1.5)<input id="dayh" type="number" min="0" step="0.5" inputmode="decimal" value="10"></label>
+      <label>Night hours (×1.75)<input id="nighth" type="number" min="0" step="0.5" inputmode="decimal" value="4"></label>
+      <label>Rest day hours (×2.0)<input id="resth" type="number" min="0" step="0.5" inputmode="decimal" value="0"></label>
+      <label>Holiday hours (×2.5)<input id="holih" type="number" min="0" step="0.5" inputmode="decimal" value="0"></label>
+    </div>
+  </fieldset>
+  <div class="err" id="err" role="alert"></div>
+  <div class="btns">
+    <button id="add" type="button">Add payslip to payroll run</button>
+    <button id="reset" type="button" class="ghost">Clear form</button>
+  </div>
+</section>
+
+<section class="card" aria-labelledby="h-slip" aria-live="polite">
+  <h2 id="h-slip">Payslip</h2>
+  <div class="meta"><span id="m-name"></span><span id="m-month"></span></div>
+  <table id="slip"></table>
+  <div class="net"><span>Net salary</span><b id="net"></b></div>
+</section>
+</div>
+
+<section class="card" style="margin-top:20px" aria-labelledby="h-run">
+  <h2 id="h-run">Payroll run</h2>
+  <div id="run"></div>
+</section>
+
+<p class="note">Tax brackets: 0–2,000 at 0%; to 4,000 at 15% (−300); to 7,000 at 20% (−500); to 10,000 at 25% (−850); to 14,000 at 30% (−1,350); above at 35% (−2,050). Transport is exempt up to the lesser of 2,200 birr or 25% of basic salary. Verify rates against current law before filing.</p>
+</div>
+<div id="v-dash" hidden></div><div id="v-hist" hidden></div><div id="v-rules" hidden></div><div id="v-test" hidden></div>
+<div id="toasts" aria-live="polite"></div>
+<footer class="site-footer">Developed by <strong>Ali</strong> · Ethiopian Payroll System</footer>
+</div>
+
+<script>
+var DAY=1.5,NIGHT=1.75,REST=2.0,HOL=2.5,EMP=0.07,ER=0.11,TCAP=2200,TPCT=0.25;
+var BR=[[2000,0,0],[4000,.15,300],[7000,.20,500],[10000,.25,850],[14000,.30,1350],[Infinity,.35,2050]];
+var run=[];
+function $(id){return document.getElementById(id)}
+function r2(v){return Number(Math.round(v+"e2")+"e-2")}
+function fmt(v){return v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function num(id){var v=parseFloat($(id).value);return isNaN(v)?0:v}
+var NUM=["basic","transport","other","otherded","hourly","dayh","nighth","resth","holih"];
+
+function tax(t){for(var i=0;i<BR.length;i++){if(t<=BR[i][0])return r2(Math.max(t*BR[i][1]-BR[i][2],0))}return 0}
+
+function calcFrom(p){
+  var e={basic:p.basic,transport:p.transport,other:p.other,otherded:p.otherded},h=p.hourly;
+  e.day=r2(h*p.dayh*DAY);e.night=r2(h*p.nighth*NIGHT);
+  e.rest=r2(h*p.resth*REST);e.holiday=r2(h*p.holih*HOL);
+  e.ot=r2(e.day+e.night+e.rest+e.holiday);
+  e.gross=r2(e.basic+e.transport+e.other+e.ot);
+  e.epen=r2(e.basic*EMP);e.erpen=r2(e.basic*ER);e.tpen=r2(e.epen+e.erpen);
+  e.exempt=Math.min(e.transport,Math.min(TCAP,r2(e.basic*TPCT)));
+  e.taxable=r2(e.gross-e.epen-e.exempt);
+  e.tax=tax(e.taxable);
+  e.ded=r2(e.epen+e.tax+e.otherded);
+  e.net=r2(e.gross-e.ded);
+  return e;
+}
+function calc(){
+  var p={};NUM.forEach(function(id){p[id]=num(id)});
+  p.basic=num("basic");p.hourly=num("hourly");
+  var e=calcFrom(p);e.name=$("name").value.trim();e.month=$("month").value.trim();return e;
+}
+
+function validate(){
+  var bad=[];
+  NUM.forEach(function(id){var v=$(id).value,x=parseFloat(v);var no=v!==""&&(isNaN(x)||x<0);$(id).classList.toggle("bad",no);if(no)bad.push(id)});
+  return bad.length?"Enter zero or a positive number in the highlighted fields.":"";
+}
+
+function row(c,l,v,cls){return '<tr class="'+(cls||"sec")+'"><td>'+l+'</td><td>'+(c?c:fmt(v))+'</td></tr>'}
+
+function render(){
+  var msg=validate();$("err").textContent=msg;
+  var e=calc();
+  $("m-name").textContent=e.name||"Employee name";
+  $("m-month").textContent=e.month||"Payroll month";
+  $("slip").innerHTML=
+    row(0,"Basic salary",e.basic)+
+    row('',"Transport allowance",e.transport).replace("</td></tr>","")+ '</td></tr>'+
+    row('<span style="color:var(--muted);font-size:13px">tax-exempt '+fmt(e.exempt)+'</span>',"",0,"sub")+
+    row(0,"Other allowance",e.other)+
+    row(0,"Day overtime",e.day,"sub")+row(0,"Night overtime",e.night,"sub")+
+    row(0,"Rest day overtime",e.rest,"sub")+row(0,"Holiday overtime",e.holiday,"sub")+
+    row(0,"Total overtime",e.ot)+
+    row(0,"Gross salary",e.gross,"tot")+
+    row(0,"Employee pension (7%)",e.epen)+
+    row(0,"Employer pension (11%), not deducted",e.erpen,"sub")+
+    row(0,"Taxable income",e.taxable)+
+    row(0,"Income tax",e.tax)+
+    row(0,"Other deduction",e.otherded)+
+    row(0,"Total deduction",e.ded,"tot");
+  $("net").textContent=fmt(e.net)+" birr";
+  return {e:e,msg:msg};
+}
+
+function sum(k){return r2(run.reduce(function(a,e){return a+e[k]},0))}
+
+function csv(list){list=list||run;
+  var cols=[["name","name"],["month","month"],["basic_salary","basic"],["transport_allowance","transport"],["other_allowance","other"],["day_ot","day"],["night_ot","night"],["rest_day_ot","rest"],["holiday_ot","holiday"],["total_overtime","ot"],["gross_salary","gross"],["employee_pension","epen"],["employer_pension","erpen"],["total_pension","tpen"],["transport_exempt_amount","exempt"],["taxable_income","taxable"],["income_tax","tax"],["other_deduction","otherded"],["total_deduction","ded"],["net_salary","net"]];
+  var q=function(s){s=String(s);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+  var out=[cols.map(function(c){return c[0]}).join(",")];
+  list.forEach(function(e){out.push(cols.map(function(c){var v=e[c[1]];return q(typeof v==="number"?v.toFixed(2):v)}).join(","))});
+  return out.join("\n");
+}
+
+function renderRun(){
+  var box=$("run");
+  if(!run.length){box.innerHTML='<p class="empty">No payslips yet. Fill in the form and choose “Add payslip to payroll run”.</p>';return}
+  var h='<div class="stats">'+
+   [["Employees",run.length],["Total gross",fmt(sum("gross"))],["Total net",fmt(sum("net"))],["Total deductions",fmt(sum("ded"))]].map(function(s){return '<div class="stat"><span>'+s[0]+'</span><b>'+s[1]+'</b></div>'}).join("")+'</div>';
+  h+='<div class="scroll"><table class="batch"><thead><tr><th>Employee</th><th>Month</th><th>Gross</th><th>Pension (7%)</th><th>Income tax</th><th>Net</th><th></th></tr></thead><tbody>';
+  run.forEach(function(e,i){h+='<tr><td>'+esc(e.name)+'</td><td>'+esc(e.month)+'</td><td>'+fmt(e.gross)+'</td><td>'+fmt(e.epen)+'</td><td>'+fmt(e.tax)+'</td><td>'+fmt(e.net)+'</td><td><button class="x" data-i="'+i+'" type="button" aria-label="Remove '+esc(e.name)+'">Remove</button></td></tr>'});
+  h+='</tbody></table></div>';
+  h+='<h2 style="margin-top:18px">Government payments</h2><div class="gov"><div>Income tax to pay<br><b>'+fmt(sum("tax"))+'</b></div><div>Pension fund to pay (18%)<br><b>'+fmt(sum("tpen"))+'</b></div></div>';
+  h+='<h2 style="margin-top:18px">Export</h2><textarea id="csv" readonly aria-label="Payroll CSV"></textarea><div class="btns" style="margin-top:8px"><button id="copy" type="button">Copy CSV</button><button id="archive" type="button">Save run to history</button><button id="clear" type="button" class="ghost">Clear payroll run</button></div><div class="err" id="cmsg" style="color:var(--muted)"></div>';
+  box.innerHTML=h;$("csv").value=csv();
+}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+
+document.addEventListener("input",function(ev){if(ev.target.closest(".grid"))render()});
+$("add").onclick=function(){
+  var r=render();
+  if(r.msg)return;
+  if(!r.e.name||!r.e.month){$("err").textContent="Enter the employee name and payroll month before adding.";$(r.e.name?"month":"name").focus();return}
+  run.push(r.e);renderRun();
+  $("name").value="";$("name").focus();render();
+};
+$("reset").onclick=function(){["name","month"].forEach(function(i){$(i).value=""});NUM.forEach(function(i){$(i).value=""});render()};
+$("run").addEventListener("click",function(ev){
+  var t=ev.target;
+  if(t.dataset&&t.dataset.i!==undefined){run.splice(+t.dataset.i,1);renderRun()}
+  else if(t.id==="clear"){run=[];renderRun()}
+  else if(t.id==="archive"){saveRun()}
+  else if(t.id==="copy"){
+    var ta=$("csv");ta.select();
+    var done=function(ok){$("cmsg").textContent=ok?"CSV copied.":"Copy was blocked. The CSV is selected: press Ctrl+C or long-press to copy."};
+    try{navigator.clipboard.writeText(ta.value).then(function(){done(true)},function(){done(false)})}catch(x){done(false)}
+  }
+});
+$("theme").onclick=function(){
+  var r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;
+  r.dataset.theme=dark?"light":"dark";
+};
+/* ===== Tabs, history, rules, diagnostics ===== */
+var TABS={dash:["Dashboard","v-dash"],slip:["Payslip","v-slip"],history:["Payroll history","v-hist"],rules:["Rates & rules","v-rules"],tests:["Diagnostics","v-test"]};
+var KEY="ethpayroll.history",H=[],AUD=[],openId=null,armed="";
+try{var sv=JSON.parse(localStorage.getItem(KEY)||"null");if(sv){H=sv.H||[];AUD=sv.A||[]}}catch(x){}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify({H:H,A:AUD}))}catch(x){}}
+function aud(m){AUD.unshift({t:new Date().toISOString().slice(0,16).replace("T"," "),m:m});AUD=AUD.slice(0,100);persist()}
+function tot(rows,k){return r2(rows.reduce(function(a,e){return a+e[k]},0))}
+function saveRun(){
+  var m=$("cmsg");
+  if(!run.length){return}
+  var months=[];run.forEach(function(e){if(months.indexOf(e.month)<0)months.push(e.month)});
+  var label=months.join(", ");
+  H.unshift({id:Date.now(),at:new Date().toISOString().slice(0,16).replace("T"," "),label:label,rows:JSON.parse(JSON.stringify(run))});
+  aud("Saved payroll run "+label+" ("+run.length+" employees)");persist();
+  toast("Saved to Payroll history.",true);if(m)m.textContent="Saved to Payroll history.";
+}
+function say(id,txt,ok){toast(txt,ok);var m=$(id);if(m){m.textContent=txt;m.style.color=ok?"var(--accent)":"var(--warn)"}}
+function localSave(name,data){
+  var ext=name.split(".").pop(),types={csv:"text/csv;charset=utf-8",xlsx:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",html:"text/html;charset=utf-8"};
+  var u=URL.createObjectURL(new Blob([data],{type:types[ext]||"application/octet-stream"})),a=document.createElement("a");
+  a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000);
+}
+async function dl(name,data,mid){
+  try{
+    var d=(window.claude&&claude.use)?await claude.use("downloads"):null;
+    if(!d){localSave(name,data);say(mid,"Downloaded "+name+".",true);return}
+    await d.save({filename:name,data:data});say(mid,"Saved "+name+".",true);
+  }catch(e){say(mid,(e&&e.code==="declined")?"Download cancelled.":"Could not save the file ("+((e&&e.code)||"error")+").")}
+}
+function csvAll(runs){
+  var q=function(v){return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v},lines=["run,"+csv([]).split("\n")[0]];
+  runs.forEach(function(r){csv(r.rows).split("\n").slice(1).forEach(function(l){lines.push(q(r.label)+","+l)})});
+  return lines.join("\n");
+}
+var XK=["basic","transport","other","day","night","rest","holiday","ot","gross","epen","erpen","exempt","taxable","tax","otherded","ded","net"];
+var XH=["Run","Employee","Month","Basic salary","Transport allowance","Other allowance","Day OT","Night OT","Rest day OT","Holiday OT","Total overtime","Gross salary","Employee pension (7%)","Employer pension (11%)","Exempt transport","Taxable income","Income tax","Other deduction","Total deduction","Net salary"];
+function wbOf(runs){
+  var X=XLSX,wb=X.utils.book_new(),reg=[XH],all=[];
+  runs.forEach(function(r){r.rows.forEach(function(e){all.push(e);reg.push([r.label,e.name,e.month].concat(XK.map(function(k){return e[k]})))})});
+  reg.push(["","TOTAL",""].concat(XK.map(function(k){return tot(all,k)})));
+  var sm=[["Run","Saved","Employees","Total gross","Total net","Income tax to pay","Pension fund to pay (18%)","Employee pension","Employer pension"]];
+  runs.forEach(function(r){sm.push([r.label,r.at,r.rows.length,tot(r.rows,"gross"),tot(r.rows,"net"),tot(r.rows,"tax"),tot(r.rows,"tpen"),tot(r.rows,"epen"),tot(r.rows,"erpen")])});
+  if(runs.length>1)sm.push(["TOTAL","",all.length,tot(all,"gross"),tot(all,"net"),tot(all,"tax"),tot(all,"tpen"),tot(all,"epen"),tot(all,"erpen")]);
+  [[sm,"Summary",[22,18,11,16,16,18,24,16,16]],[reg,"Payroll register",[22,24,14].concat(XK.map(function(){return 17}))]].forEach(function(a){
+    var ws=X.utils.aoa_to_sheet(a[0]);
+    Object.keys(ws).forEach(function(c){if(c[0]!=="!"&&ws[c].t==="n")ws[c].z="#,##0.00"});
+    ws["!cols"]=a[2].map(function(w){return{wch:w}});
+    X.utils.book_append_sheet(wb,ws,a[1]);
+  });
+  return wb;
+}
+function xls(runs,name,mid){
+  if(!window.XLSX){say(mid,"The Excel library didn’t load. Download the CSV instead.");return}
+  dl(name,XLSX.write(wbOf(runs),{bookType:"xlsx",type:"array"}),mid);
+}
+function vHist(){
+  var h='<div class="card"><h2>Payroll history</h2>';
+  if(!H.length)return h+'<p class="empty">No saved payroll runs yet. On the Payslip tab, add employees to a payroll run and choose “Save run to history”.</p></div>';
+  h+='<div class="flex flex-wrap items-center gap-2 mb-3"><span class="text-sm" style="color:var(--muted)">Export all saved runs:</span><button id="allcsv" type="button" class="ghost">'+ic("dl")+'Download CSV</button><button id="allxls" type="button">'+ic("dl")+'Download Excel (.xlsx)</button></div><div class="err" id="xmsg" style="color:var(--muted)"></div>';
+  h+='<label class="srch"><span class="sr">Search saved runs</span><input id="hq" type="search" placeholder="Search by month or date" value="'+esc(hq)+'"></label><div id="htbl">'+histTable()+'</div></div>';
+  var o=H.filter(function(x){return x.id===openId})[0];
+  if(o){
+    h+='<div class="card"><h2>'+esc(o.label)+'</h2><div class="kp"><div><span>Total gross</span><b>'+fmt(tot(o.rows,"gross"))+'</b></div><div><span>Total net</span><b>'+fmt(tot(o.rows,"net"))+'</b></div><div><span>Income tax to pay</span><b>'+fmt(tot(o.rows,"tax"))+'</b></div><div><span>Pension fund to pay</span><b>'+fmt(tot(o.rows,"tpen"))+'</b></div></div>'+
+    '<div class="scroll"><table class="batch"><thead><tr><th>Employee</th><th>Gross</th><th>Pension (7%)</th><th>Taxable</th><th>Income tax</th><th>Deduction</th><th>Net</th><th></th></tr></thead><tbody>'+
+    o.rows.map(function(e,i){return'<tr><td>'+esc(e.name)+'</td><td>'+fmt(e.gross)+'</td><td>'+fmt(e.epen)+'</td><td>'+fmt(e.taxable)+'</td><td>'+fmt(e.tax)+'</td><td>'+fmt(e.ded)+'</td><td>'+fmt(e.net)+'</td><td><button class="ghost btn-sm" data-ps="'+i+'" type="button">Payslip</button></td></tr>'}).join("")+'</tbody></table></div>'+(hps!==null&&o.rows[hps]?'<h2 style="margin-top:16px">Payslip</h2>'+pbody(o.rows[hps],o)+'<div class="btns" style="margin:10px 0"><button id="pprint" type="button">Print / Save as PDF</button><button id="pdl" type="button" class="ghost">'+ic("dl")+'Download printable file</button></div>':'')+
+    '<h2 style="margin-top:16px">CSV</h2><textarea id="hcsv" readonly aria-label="CSV of this run">'+esc(csv(o.rows))+'</textarea><div class="btns" style="margin-top:8px"><button id="hcsvdl" type="button" class="ghost">'+ic("dl")+'Download CSV</button><button id="hxls" type="button">'+ic("dl")+'Download Excel (.xlsx)</button><button id="hcopy" type="button" class="ghost">Copy CSV</button></div><div class="err" id="hmsg" style="color:var(--muted)"></div></div>';
+  }
+  return h;
+}
+function vRules(){
+  var rows=BR.map(function(b,i){var lo=i?BR[i-1][0]:0;return'<tr><td>'+fmt(lo)+(b[0]===Infinity?" and above":" to "+fmt(b[0]))+'</td><td>'+Math.round(b[1]*100)+'%</td><td>'+fmt(b[2])+'</td></tr>'}).join("");
+  return'<div class="card"><h2>Employment income tax (Proclamation No. 1395/2025)</h2><p style="color:var(--muted)">Tax = taxable income × rate − deduction, per month.</p><div class="scroll"><table class="plain"><thead><tr><th>Monthly taxable income (birr)</th><th>Rate</th><th>Deduction</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>'+
+  '<div class="card"><h2>Other rules</h2><div class="scroll"><table class="plain"><tbody>'+
+  '<tr><td>Taxable income</td><td>Gross salary − employee pension − tax-exempt transport</td></tr>'+
+  '<tr><td>Pension</td><td>Employee '+EMP*100+'%, employer '+ER*100+'%, calculated on basic salary</td></tr>'+
+  '<tr><td>Transport exemption</td><td>Lesser of '+fmt(TCAP)+' birr or '+TPCT*100+'% of basic salary; any excess is taxable</td></tr>'+
+  '<tr><td>Overtime multipliers</td><td>Day ×'+DAY+' · Night ×'+NIGHT+' · Rest day ×'+REST+' · Holiday ×'+HOL+'</td></tr>'+
+  '<tr><td>Rounding</td><td>2 decimal places, half up, on each line</td></tr></tbody></table></div><p style="color:var(--muted)">Verify these rates against current law before filing.</p></div>';
+}
+function runTests(){
+  var T=[],t=function(n,a,b){T.push({n:n,ok:a===b,a:a,b:b})};
+  t("Tax at 2,000 is 0",tax(2000),0);t("Tax at 4,000",tax(4000),300);t("Tax at 7,000",tax(7000),900);t("Tax at 10,000",tax(10000),1650);t("Tax at 14,000",tax(14000),2850);t("Tax at 20,000",tax(20000),4950);
+  var ok=true;for(var i=1;i<BR.length;i++){var u=BR[i-1][0],b=BR[i];if(r2(u*b[1]-b[2])!==tax(u))ok=false}t("Brackets are continuous at every boundary",ok,true);
+  var z={basic:12000,transport:2500,other:0,otherded:0,hourly:0,dayh:0,nighth:0,resth:0,holih:0},g=calcFrom(z);
+  t("Reference payslip: gross",g.gross,14500);t("Reference: exempt transport",g.exempt,2200);t("Reference: taxable income",g.taxable,11460);t("Reference: income tax",g.tax,2088);t("Reference: net salary",g.net,11572);
+  t("Pension 7% of 12,000",g.epen,840);t("Pension 11% of 12,000",g.erpen,1320);
+  t("Transport limited to 25% of basic",calcFrom({basic:4000,transport:2500,other:0,otherded:0,hourly:0,dayh:0,nighth:0,resth:0,holih:0}).exempt,1000);
+  t("Day overtime 10 h at 100",calcFrom({basic:1,transport:0,other:0,otherded:0,hourly:100,dayh:10,nighth:0,resth:0,holih:0}).day,1500);
+  t("Holiday overtime 2 h at 100",calcFrom({basic:1,transport:0,other:0,otherded:0,hourly:100,dayh:0,nighth:0,resth:0,holih:2}).holiday,500);
+  t("Half-up rounding of 1.005",r2(1.005),1.01);t("Zero income gives zero tax",tax(0),0);
+  return T;
+}
+function vTests(){
+  var T=runTests(),p=T.filter(function(x){return x.ok}).length;
+  return'<div class="card"><h2>Calculation self-tests</h2><p class="'+(p===T.length?"pass":"fail")+'">'+p+' of '+T.length+' tests passed</p><div class="scroll"><table class="plain"><tbody>'+
+  T.map(function(x){return'<tr><td>'+esc(x.n)+'</td><td class="'+(x.ok?"pass":"fail")+'">'+(x.ok?"Pass":"Fail: got "+x.a+", expected "+x.b)+'</td></tr>'}).join("")+'</tbody></table></div></div>'+
+  '<div class="card"><h2>Audit log</h2>'+(AUD.length?'<div class="scroll"><table class="plain"><tbody>'+AUD.map(function(a){return'<tr><td>'+esc(a.t)+'</td><td>'+esc(a.m)+'</td></tr>'}).join("")+'</tbody></table></div>':'<p class="empty">No activity yet.</p>')+
+  '<div class="btns" style="margin-top:10px"><button class="danger" id="erase" type="button">'+(armed==="e"?"Confirm: erase saved history":"Erase saved history")+'</button></div></div>';
+}
+function route(){
+  var k=location.hash.slice(1);if(!TABS[k])k="dash";
+  $("nav").innerHTML=Object.keys(TABS).map(function(x){return'<a href="#'+x+'"'+(x===k?' aria-current="page"':"")+'>'+ic(x)+TABS[x][0]+'</a>'}).join("");
+  Object.keys(TABS).forEach(function(x){$(TABS[x][1]).hidden=x!==k});
+  if(k==="dash")$("v-dash").innerHTML=vDash();
+  if(k==="history")$("v-hist").innerHTML=vHist();
+  if(k==="rules")$("v-rules").innerHTML=vRules();
+  if(k==="tests")$("v-test").innerHTML=vTests();
+}
+window.addEventListener("hashchange",function(){armed="";route()});
+$("v-hist").addEventListener("click",function(ev){
+  var t=ev.target,d=t.dataset||{};
+  if(d.open){openId=+d.open;hps=null;route()}
+  else if(d.sort){hs=hs.k===d.sort?{k:d.sort,d:-hs.d}:{k:d.sort,d:d.sort==="label"?1:-1};$("htbl").innerHTML=histTable()}
+  else if(d.ps!==undefined){hps=+d.ps;route();var ps=$("pslip");if(ps)ps.scrollIntoView({block:"center"})}
+  else if(t.id==="pprint"){try{window.print()}catch(x){toast("Printing is blocked in this view. Use “Download printable file”.")}}
+  else if(t.id==="pdl"){var oo=H.filter(function(x){return x.id===openId})[0];if(oo&&oo.rows[hps]){var ee=oo.rows[hps];dl("payslip-"+ee.name.replace(/[^\w\-]+/g,"_")+"-"+oo.label.replace(/[^\w\-]+/g,"_")+".html","<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>Payslip</title><style>"+PCSS+"</style></head><body>"+pbody(ee,oo)+"</body></html>","hmsg")}}
+  else if(d.del){if(armed==="d"+d.del){var x=H.filter(function(r){return r.id==d.del})[0];H=H.filter(function(r){return r.id!=d.del});aud("Deleted saved run "+x.label);if(openId==d.del)openId=null;armed=""}else armed="d"+d.del;persist();route()}
+  else if(t.id==="allcsv"){dl("payroll-history-all.csv","\uFEFF"+csvAll(H),"xmsg")}
+  else if(t.id==="allxls"){xls(H,"payroll-history-all.xlsx","xmsg")}
+  else if(t.id==="hcsvdl"||t.id==="hxls"){var o2=H.filter(function(x){return x.id===openId})[0];if(o2){var fn="payroll-"+o2.label.replace(/[^\w\-]+/g,"_");if(t.id==="hxls")xls([o2],fn+".xlsx","hmsg");else dl(fn+".csv","\uFEFF"+csv(o2.rows),"hmsg")}}
+  else if(t.id==="hcopy"){var ta=$("hcsv");ta.select();var m=$("hmsg"),done=function(o){m.textContent=o?"CSV copied.":"Copy was blocked. The CSV is selected: press Ctrl+C or long-press to copy."};try{navigator.clipboard.writeText(ta.value).then(function(){done(true)},function(){done(false)})}catch(x){done(false)}}
+});
+$("v-test").addEventListener("click",function(ev){
+  if(ev.target.id==="erase"){if(armed==="e"){H=[];AUD=[];openId=null;armed="";try{localStorage.removeItem(KEY)}catch(x){}}else armed="e";route()}
+});
+/* ===== v4: dashboard, sortable history, printable payslip, toasts, icons ===== */
+var hq="",hs={k:"at",d:-1},hps=null;
+var IC={dash:"M3 12l9-8 9 8M5 10v10h14V10",slip:"M6 3h12v18l-3-2-3 2-3-2-3 2z",history:"M3 12a9 9 0 109-9M3 4v5h5M12 7v5l3 2",rules:"M4 5h16M4 12h16M4 19h10",tests:"M5 12l5 5L20 7",dl:"M12 4v11M7 11l5 5 5-5M5 20h14"};
+function ic(n){return'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px"><path d="'+IC[n]+'"/></svg>'}
+function toast(m,ok){var t=document.createElement("div");t.className="toast"+(ok?" ok":"");t.textContent=m;$("toasts").appendChild(t);setTimeout(function(){t.remove()},4200)}
+function met(x){return{id:x.id,label:x.label,at:x.at,n:x.rows.length,gross:tot(x.rows,"gross"),tax:tot(x.rows,"tax"),tpen:tot(x.rows,"tpen"),net:tot(x.rows,"net")}}
+function histTable(){
+  var q=hq.toLowerCase(),L=H.map(met).filter(function(m){return!q||(m.label+" "+m.at).toLowerCase().indexOf(q)>=0});
+  L.sort(function(a,b){var x=a[hs.k],y=b[hs.k];return(x<y?-1:x>y?1:0)*hs.d});
+  if(!L.length)return'<p class="empty">No saved runs match “'+esc(hq)+'”.</p>';
+  var cols=[["label","Payroll month"],["at","Saved"],["n","Employees"],["gross","Gross"],["tax","Income tax"],["tpen","Pension (18%)"],["net","Net"]];
+  return'<div class="scroll tall"><table class="batch sticky"><thead><tr>'+cols.map(function(c){var on=hs.k===c[0];return'<th aria-sort="'+(on?(hs.d>0?"ascending":"descending"):"none")+'"><button class="th" data-sort="'+c[0]+'" type="button">'+c[1]+(on?(hs.d>0?" ▲":" ▼"):"")+'</button></th>'}).join("")+'<th>Status</th><th></th></tr></thead><tbody>'+
+  L.map(function(m){return'<tr><td>'+esc(m.label)+'</td><td>'+esc(m.at)+'</td><td>'+m.n+'</td><td>'+fmt(m.gross)+'</td><td>'+fmt(m.tax)+'</td><td>'+fmt(m.tpen)+'</td><td>'+fmt(m.net)+'</td><td><span class="badge">Saved</span></td><td><button class="ghost btn-sm" data-open="'+m.id+'" type="button">View</button> <button class="danger btn-sm" data-del="'+m.id+'" type="button">'+(armed==="d"+m.id?"Confirm delete":"Delete")+'</button></td></tr>'}).join("")+'</tbody></table></div>';
+}
+$("v-hist").addEventListener("input",function(ev){if(ev.target.id==="hq"){hq=ev.target.value;$("htbl").innerHTML=histTable()}});
+function vDash(){
+  if(!H.length)return'<div class="card"><h2>Welcome</h2><p style="color:var(--muted)">No payroll saved yet. Create payslips, add them to a payroll run, then save the run. Totals and trends will appear here.</p><div class="btns"><button data-go="slip" type="button">'+ic("slip")+'Create a payslip</button></div></div>';
+  var m=met(H[0]),pv=H[1]?met(H[1]):null,ch=pv&&pv.net?r2((m.net-pv.net)/pv.net*100):null;
+  var h='<div class="card"><h2>Latest payroll: '+esc(m.label)+'</h2><div class="kp big"><div><span>Employees paid</span><b>'+m.n+'</b></div><div><span>Total gross</span><b>'+fmt(m.gross)+'</b></div><div><span>Total net</span><b>'+fmt(m.net)+'</b></div><div><span>Income tax to remit</span><b>'+fmt(m.tax)+'</b></div><div><span>Pension fund to remit</span><b>'+fmt(m.tpen)+'</b></div><div><span>Saved runs</span><b>'+H.length+'</b></div></div>'+
+   (ch!==null?'<p style="color:var(--muted)">Net pay is '+(ch>=0?"up ":"down ")+Math.abs(ch)+'% compared with '+esc(pv.label)+'.</p>':'')+'</div>';
+  var R=H.slice(0,6).reverse().map(met),mx=Math.max.apply(null,R.map(function(x){return x.net}))||1;
+  h+='<div class="card"><h2>Net pay by run</h2><div class="bars">'+R.map(function(x){return'<span>'+esc(x.label)+'</span><div class="bar" style="width:'+Math.max(1,x.net/mx*100)+'%" role="img" aria-label="'+esc(x.label)+' net '+fmt(x.net)+'"></div><b style="text-align:right">'+fmt(x.net)+'</b>'}).join("")+'</div><div class="btns"><button data-go="history" type="button" class="ghost">'+ic("history")+'Open payroll history</button><button data-go="slip" type="button">'+ic("slip")+'New payslip</button></div></div>';
+  return h;
+}
+$("v-dash").addEventListener("click",function(ev){var g=ev.target.closest("[data-go]");if(g)location.hash=g.dataset.go});
+var PCSS='@page{size:A4;margin:14mm}.pslip{background:#fff;color:#111;max-width:680px;margin:0 auto;padding:28px;border:1px solid #cfd5cd;border-radius:6px;font:14px/1.5 system-ui,sans-serif}.pslip .ph{display:flex;justify-content:space-between;gap:12px;border-bottom:3px solid #078930;padding-bottom:10px;margin-bottom:12px}.pslip .ph span{color:#555;font-size:13px}.pslip .pr{text-align:right}.pslip table{width:100%;border-collapse:collapse}.pslip td{padding:5px 0;border-bottom:1px solid #e3e6e1}.pslip td:last-child{text-align:right}.pslip .b td{font-weight:600;border-top:1px solid #111}.pslip .m td{color:#666;font-size:12.5px}.pslip .pnet{display:flex;justify-content:space-between;align-items:baseline;background:#e7f3ec;border-left:4px solid #078930;padding:10px 14px;margin-top:12px}.pslip .pnet b{font-size:22px}.pslip .sig{display:flex;gap:40px;margin-top:48px}.pslip .sig div{flex:1;border-top:1px solid #111;padding-top:4px;font-size:12.5px;color:#555}.pslip .pf{text-align:center;color:#777;font-size:12px;margin:20px 0 0}';
+(function(){var st=document.createElement("style");st.textContent=PCSS+'@media print{body *{visibility:hidden}#pslip,#pslip *{visibility:visible}#pslip{position:absolute;left:0;top:0;width:100%;border:0}}';document.head.appendChild(st)})();
+function pbody(e,o){
+  var L=function(a,b,c){return'<tr class="'+(c||"")+'"><td>'+a+'</td><td>'+fmt(b)+'</td></tr>'};
+  return'<div id="pslip" class="pslip"><div class="ph"><div><b>Ethiopian Payroll System</b><br><span>Payslip · '+esc(o.label)+'</span></div><div class="pr"><b>'+esc(e.name)+'</b><br><span>Month: '+esc(e.month)+'</span></div></div><table>'+
+  L("Basic salary",e.basic)+L("Transport allowance",e.transport)+L("Other allowance",e.other)+L("Overtime",e.ot)+L("Gross salary",e.gross,"b")+
+  L("Employee pension (7%)",e.epen)+L("Income tax",e.tax)+L("Other deduction",e.otherded)+L("Total deduction",e.ded,"b")+
+  L("Taxable income",e.taxable,"m")+L("Tax-exempt transport",e.exempt,"m")+L("Employer pension (11%), not deducted",e.erpen,"m")+
+  '</table><div class="pnet"><span>Net salary</span><b>'+fmt(e.net)+' birr</b></div><div class="sig"><div>Prepared by</div><div>Employee signature</div></div><p class="pf">Developed by Ali</p></div>';
+}
+/* ===== colour palettes: [accent, soft, button text, page background] ===== */
+var PAL={rose:["Rose",["#c2255c","#fbd7e4","#ffffff","#fdeef3"],["#ff6b9a","#4a1730","#2a0615","#1a0e14"],"#c2255c"],orange:["Orange",["#d9480f","#ffe0cc","#ffffff","#fff1e8"],["#ff922b","#4a2408","#2a1204","#1a110a"],"#f76707"],teal:["Teal",["#0c8a7b","#c4efe7","#ffffff","#e6f7f3"],["#20c9a6","#0d3b33","#04201c","#0a1815"],"#12a594"],blue:["Blue",["#1c6fd1","#d3e5fb","#ffffff","#e8f1fc"],["#4dabf7","#12304f","#06182e","#0a1420"],"#1c7ed6"],purple:["Purple",["#8e24aa","#ecd3f4","#ffffff","#f5e9f9"],["#d27cf0","#3b1650","#25082f","#150c1a"],"#9c36b5"]};
+var pal="blue";
+try{var sp=localStorage.getItem("ethpayroll.pal");if(sp&&PAL[sp])pal=sp}catch(x){}
+function isDark(){var r=document.documentElement;return r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches}
+function applyPal(){var p=PAL[pal][isDark()?2:1],st=document.documentElement.style;st.setProperty("--accent",p[0]);st.setProperty("--soft",p[1]);st.setProperty("--accent-ink",p[2]);st.setProperty("--bg",isDark()?"#121320":"#f0f1fa");st.setProperty("--surface",isDark()?"#1b1c2a":"#fefbff");st.setProperty("--line",isDark()?"#2e3044":"#dfe1f0");
+  $("swatches").innerHTML=Object.keys(PAL).map(function(k){return'<button class="sw" type="button" data-pal="'+k+'" aria-pressed="'+(k===pal)+'" aria-label="'+PAL[k][0]+' palette" title="'+PAL[k][0]+'" style="background:'+PAL[k][3]+'"></button>'}).join("")}
+$("swatches").addEventListener("click",function(ev){var k=ev.target.dataset&&ev.target.dataset.pal;if(!k)return;pal=k;try{localStorage.setItem("ethpayroll.pal",k)}catch(x){}applyPal();toast(PAL[k][0]+" palette applied.",true)});
+$("theme").addEventListener("click",applyPal);
+try{matchMedia("(prefers-color-scheme:dark)").addEventListener("change",applyPal)}catch(x){}
+applyPal();
+route();
+render();renderRun();
+</script>
+</body>
+</html>
